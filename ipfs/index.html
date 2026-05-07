@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading....</title>
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #d58846;          /* цвет бумаги на случай если cover не покрывает всё */
+            background-image: url('bg.jpg');
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+
+        .container {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            padding: 20px;
+        }
+
+        h1 {
+            color: white;
+            text-transform: uppercase;
+            font-size: 2em;
+            font-weight: 700;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .btn-wrapper {
+            width: 100%;
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-btn {
+            background-color: #1d2333;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 16px 20px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            display: block;
+        }
+
+        .custom-btn:hover {
+            background-color: #2a3245;
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.8);
+            transform: translateY(-2px);
+        }
+
+        .icon { margin-right: 5px; }
+
+        .loader {
+            color: white;
+            font-size: 1.2em;
+            text-shadow: 1px 1px 4px rgba(0,0,0,0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <div class="container">
+        <div id="content">
+            <div class="loader">Loading....</div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  ЕДИНСТВЕННОЕ, ЧТО МЕНЯЕТСЯ ДЛЯ КАЖДОГО НОВОГО САЙТА:
+        //  Поставь сюда номер новой папки в репозитории ens-sites-data
+        // ============================================================
+        var SITE_ID = "REPLACE_ME";
+
+        var DATA_URL = "https://api.github.com/repos/Mimik-322/ens-sites-data/contents/" + SITE_ID + "/data.json";
+
+        function loadData() {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", DATA_URL, true);
+            xhr.setRequestHeader("Accept", "application/vnd.github.v3.raw");
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        render(data);
+                    } catch(e) {
+                        showError();
+                    }
+                } else {
+                    showError();
+                }
+            };
+            xhr.onerror = function() { showError(); };
+            xhr.send();
+        }
+
+        function showError() {
+            document.getElementById("content").innerHTML =
+                '<div class="loader">Error loading data. Please try again later.</div>';
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function render(data) {
+            document.title = data.title || document.title;
+
+            var html = '';
+            if (data.title) {
+                html += '<h1>' + escapeHtml(data.title) + '</h1>';
+            }
+            html += '<div class="btn-wrapper">';
+
+            data.buttons.forEach(function(btn) {
+                if (btn.name && btn.name.trim() !== "") {
+                    html += '<a href="' + escapeHtml(btn.link) + '" class="custom-btn" target="_blank">'
+                          + escapeHtml(btn.name) + '</a>';
+                }
+            });
+
+            html += '</div>';
+            document.getElementById("content").innerHTML = html;
+        }
+
+        loadData();
+    </script>
+
+</body>
+</html>

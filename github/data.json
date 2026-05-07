@@ -1,0 +1,9 @@
+{
+  "title": "Crown-Shop",
+  "buttons": [
+    { "name": "Контакты МСК", "link": "https://example.com/msk" },
+    { "name": "Приложение", "link": "https://example.com/app" },
+    { "name": "Контакты СПБ", "link": "https://example.com/spb" },
+    { "name": "Element Мессенджер : Жми для перехода", "link": "https://element.io/" }
+  ]
+}
